@@ -31,7 +31,7 @@ const Login = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-
+    console.log("API BASE URL =", import.meta.env.VITE_APP_API_BASE);
     try {
       if (isLogin) {
         post('/auth/login', {
