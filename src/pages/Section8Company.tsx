@@ -1,0 +1,37 @@
+
+import Header from '@/components/Header';
+import Breadcrumb from '@/components/section8-company/Breadcrumb';
+import HeroSection from '@/components/section8-company/HeroSection';
+import DetailsSection from '@/components/section8-company/DetailsSection';
+import ComparisonTable from '@/components/proprietorship/ComparisonTable';
+import DocumentsSection from '@/components/section8-company/DocumentsSection';
+import PricingSection from '@/components/section8-company/PricingSection';
+
+const Section8Company = () => {
+  return (
+    <div className="bg-white min-h-screen">
+      <div className="bg-gray-50/50">
+        <main className="max-w-screen-xl mx-auto px-4 py-6">
+          <Breadcrumb />
+          <div >
+            <div >
+              <HeroSection />
+              <PricingSection/>
+              <DetailsSection />
+              <div>
+
+                <h2 className="text-3xl font-bold text-gray-800 mb-4">Proprietorship vs Limited Liability Partnership (LLP) vs Company</h2>
+                <ComparisonTable />
+              </div>
+              <DocumentsSection />
+            </div>
+            <aside className="lg:col-span-4">
+            </aside>
+          </div>
+        </main>
+  </div>
+    </div>
+  );
+};
+
+export default Section8Company;

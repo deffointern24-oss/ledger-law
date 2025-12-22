@@ -1,0 +1,991 @@
+{
+    "info": {
+        "name": "Ledger Law Complete API - Optimized",
+        "_postman_id": "9b324b32-1c9f-4abf-8a9e-cc7d23c7efb5",
+        "description": "Ledger Law complete backend API with authentication, users, services, cart, wishlist, orders, and admin dashboard. Includes pagination, search, and filtering.",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "variable": [
+        {
+            "key": "authToken",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "SERVICE_ID",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "ORDER_ID",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "USER_ID",
+            "value": "",
+            "type": "string"
+        }
+    ],
+    "item": [
+        {
+            "name": "Auth",
+            "item": [
+                {
+                    "name": "Signup",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john@ledgerlaw.com\",\n  \"password\": \"password123\",\n  \"role\": \"admin\",\n  \"phone\": \"9876543210\",\n  \"business_name\": \"Ledger Law Consultancy\",\n  \"gstin\": \"29ABCDE1234F1Z5\",\n  \"address\": \"123, MG Road\",\n  \"city\": \"Lucknow\",\n  \"state\": \"Uttar Pradesh\",\n  \"pincode\": \"226001\"\n}"
+                        },
+                        "url": {
+                            "raw": "http://localhost:5000/api/auth/signup",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "5000",
+                            "path": ["api", "auth", "signup"]
+                        }
+                    },
+                    "description": "Register new user with role (admin/customer)"
+                },
+                {
+                    "name": "Login",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Auto-save JWT token\", function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    if(jsonData.token){",
+                                    "        pm.collectionVariables.set(\"authToken\", jsonData.token);",
+                                    "        pm.environment.set(\"authToken\", jsonData.token);",
+                                    "    }",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"email\": \"john@ledgerlaw.com\",\n  \"password\": \"password123\"\n}"
+                        },
+                        "url": {
+                            "raw": "http://localhost:5000/api/auth/login",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "5000",
+                            "path": ["api", "auth", "login"]
+                        }
+                    },
+                    "description": "Login with email and password. Token auto-saved."
+                },
+                {
+                    "name": "Logout",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{authToken}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "http://localhost:5000/api/auth/logout",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "5000",
+                            "path": ["api", "auth", "logout"]
+                        }
+                    },
+                    "description": "Logout current user"
+                }
+            ]
+        },
+        {
+            "name": "Users",
+            "item": [
+                {
+                    "name": "Get Profile",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{authToken}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "http://localhost:5000/api/users/profile",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "5000",
+                            "path": ["api", "users", "profile"]
+                        }
+                    },
+                    "description": "Get current logged-in user profile"
+                },
+                {
+                    "name": "Update Profile",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{authToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"John Updated\",\n  \"phone\": \"9876543210\",\n  \"business_name\": \"Ledger Law Consultancy\",\n  \"gstin\": \"29ABCDE1234F1Z5\",\n  \"address\": \"123, MG Road\",\n  \"city\": \"Mumbai\",\n  \"state\": \"Maharashtra\",\n  \"pincode\": \"400001\"\n}"
+                        },
+                        "url": {
+                            "raw": "http://localhost:5000/api/users/profile",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "5000",
+                            "path": ["api", "users", "profile"]
+                        }
+                    },
+                    "description": "Update user profile. Include password field to change password."
+                },
+                {
+                    "name": "Get All Users (Admin)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{authToken}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "http://localhost:5000/api/users/all?page=1&limit=10",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "5000",
+                            "path": ["api", "users", "all"],
+                            "query": [
+                                {
+                                    "key": "page",
+                                    "value": "1",
+                                    "description": "Page number"
+                                },
+                                {
+                                    "key": "limit",
+                                    "value": "10",
+                                    "description": "Items per page (max 50)"
+                                },
+                                {
+                                    "key": "role",
+                                    "value": "customer",
+                                    "disabled": true,
+                                    "description": "Filter by role: admin/customer"
+                                },
+                                {
+                                    "key": "search",
+                                    "value": "john",
+                                    "disabled": true,
+                                    "description": "Search by name, email, phone, business_name"
+                                }
+                            ]
+                        }
+                    },
+                    "description": "Get all users with pagination, search, and role filter"
+                },
+                {
+                    "name": "Get User by ID (Admin)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{authToken}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "http://localhost:5000/api/users/{{USER_ID}}",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "5000",
+                            "path": ["api", "users", "{{USER_ID}}"]
+                        }
+                    },
+                    "description": "Get specific user details by ID (Admin only)"
+                },
+                {
+                    "name": "Delete User (Admin)",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{authToken}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "http://localhost:5000/api/users/{{USER_ID}}",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "5000",
+                            "path": ["api", "users", "{{USER_ID}}"]
+                        }
+                    },
+                    "description": "Delete user account (Admin only, cannot delete self)"
+                }
+            ]
+        },
+        {
+            "name": "Services",
+            "item": [
+                {
+                    "name": "Add New Service (Admin)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{authToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"title\": \"Legal Consultation\",\n  \"shortDescription\": \"Quick legal consultation\",\n  \"fullDescription\": \"Get expert advice on legal matters from our experienced team.\",\n  \"price\": 1999,\n  \"category\": \"consultation\",\n  \"legalTags\": [\"family law\", \"civil case\"]\n}"
+                        },
+                        "url": {
+                            "raw": "http://localhost:5000/api/services",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "5000",
+                            "path": ["api", "services"]
+                        }
+                    },
+                    "description": "Create new service (Admin only)"
+                },
+                {
+                    "name": "View Services List",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "http://localhost:5000/api/services",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "5000",
+                            "path": ["api", "services"]
+                        }
+                    },
+                    "description": "Get all services (public)"
+                },
+                {
+                    "name": "Service Details",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "http://localhost:5000/api/services/{{SERVICE_ID}}",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "5000",
+                            "path": ["api", "services", "{{SERVICE_ID}}"]
+                        }
+                    },
+                    "description": "Get single service details by ID"
+                },
+                {
+                    "name": "Filter Services by Category",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "http://localhost:5000/api/services?category=consultation",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "5000",
+                            "path": ["api", "services"],
+                            "query": [
+                                {
+                                    "key": "category",
+                                    "value": "consultation"
+                                }
+                            ]
+                        }
+                    },
+                    "description": "Filter services by category"
+                },
+                {
+                    "name": "Edit Service (Admin)",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{authToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"title\": \"Legal Consultation Updated\",\n  \"price\": 2499\n}"
+                        },
+                        "url": {
+                            "raw": "http://localhost:5000/api/services/{{SERVICE_ID}}",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "5000",
+                            "path": ["api", "services", "{{SERVICE_ID}}"]
+                        }
+                    },
+                    "description": "Update service details (Admin only)"
+                },
+                {
+                    "name": "Delete Service (Admin)",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{authToken}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "http://localhost:5000/api/services/{{SERVICE_ID}}",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "5000",
+                            "path": ["api", "services", "{{SERVICE_ID}}"]
+                        }
+                    },
+                    "description": "Delete service (Admin only)"
+                }
+            ]
+        },
+        {
+            "name": "Cart",
+            "item": [
+                {
+                    "name": "Get Cart",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{authToken}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "http://localhost:5000/api/cart",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "5000",
+                            "path": ["api", "cart"]
+                        }
+                    },
+                    "description": "Get current user's cart with all items"
+                },
+                {
+                    "name": "Add to Cart",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{authToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"serviceId\": \"gst-filing-registration-6months\",\n  \"serviceName\": \"GST Filing & Registration - 6 Months\",\n  \"price\": 4999,\n  \"quantity\": 1\n}"
+                        },
+                        "url": {
+                            "raw": "http://localhost:5000/api/cart/add",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "5000",
+                            "path": ["api", "cart", "add"]
+                        }
+                    },
+                    "description": "Add service to cart (static serviceId, serviceName, price)"
+                },
+                {
+                    "name": "Update Cart Item",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{authToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"serviceId\": \"gst-filing-registration-6months\",\n  \"quantity\": 2\n}"
+                        },
+                        "url": {
+                            "raw": "http://localhost:5000/api/cart/update",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "5000",
+                            "path": ["api", "cart", "update"]
+                        }
+                    },
+                    "description": "Update quantity of item in cart (1-99)"
+                },
+                {
+                    "name": "Remove from Cart",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{authToken}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "http://localhost:5000/api/cart/remove/gst-filing-registration-6months",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "5000",
+                            "path": ["api", "cart", "remove", "gst-filing-registration-6months"]
+                        }
+                    },
+                    "description": "Remove specific service from cart"
+                },
+                {
+                    "name": "Clear Cart",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{authToken}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "http://localhost:5000/api/cart/clear",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "5000",
+                            "path": ["api", "cart", "clear"]
+                        }
+                    },
+                    "description": "Clear all items from cart"
+                }
+            ]
+        },
+        {
+            "name": "Wishlist",
+            "item": [
+                {
+                    "name": "Get Wishlist",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{authToken}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "http://localhost:5000/api/wishlist",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "5000",
+                            "path": ["api", "wishlist"]
+                        }
+                    },
+                    "description": "Get current user's wishlist"
+                },
+                {
+                    "name": "Get Wishlist Count",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{authToken}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "http://localhost:5000/api/wishlist/count",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "5000",
+                            "path": ["api", "wishlist", "count"]
+                        }
+                    },
+                    "description": "Get total wishlist items count (for badges)"
+                },
+                {
+                    "name": "Check Wishlist Item",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{authToken}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "http://localhost:5000/api/wishlist/check/gst-filing-registration-6months",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "5000",
+                            "path": ["api", "wishlist", "check", "gst-filing-registration-6months"]
+                        }
+                    },
+                    "description": "Check if specific item is in wishlist"
+                },
+                {
+                    "name": "Add to Wishlist",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{authToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"serviceId\": \"gst-filing-registration-6months\",\n  \"serviceName\": \"GST Filing & Registration - 6 Months\",\n  \"price\": 4999\n}"
+                        },
+                        "url": {
+                            "raw": "http://localhost:5000/api/wishlist/add",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "5000",
+                            "path": ["api", "wishlist", "add"]
+                        }
+                    },
+                    "description": "Add item to wishlist"
+                },
+                {
+                    "name": "Move to Cart (Bulk)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{authToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"serviceIds\": [\n    \"gst-filing-registration-6months\",\n    \"trademark-registration\"\n  ]\n}"
+                        },
+                        "url": {
+                            "raw": "http://localhost:5000/api/wishlist/move-to-cart",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "5000",
+                            "path": ["api", "wishlist", "move-to-cart"]
+                        }
+                    },
+                    "description": "Move multiple items from wishlist to cart"
+                },
+                {
+                    "name": "Remove from Wishlist",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{authToken}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "http://localhost:5000/api/wishlist/gst-filing-registration-6months",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "5000",
+                            "path": ["api", "wishlist", "gst-filing-registration-6months"]
+                        }
+                    },
+                    "description": "Remove specific item from wishlist"
+                },
+                {
+                    "name": "Clear Wishlist",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{authToken}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "http://localhost:5000/api/wishlist/clear",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "5000",
+                            "path": ["api", "wishlist", "clear"]
+                        }
+                    },
+                    "description": "Clear entire wishlist"
+                }
+            ]
+        },
+        {
+            "name": "Orders",
+            "item": [
+                {
+                    "name": "Create Order (Checkout)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{authToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"paymentMethod\": \"UPI\",\n  \"notes\": \"Please process urgently\"\n}"
+                        },
+                        "url": {
+                            "raw": "http://localhost:5000/api/orders",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "5000",
+                            "path": ["api", "orders"]
+                        }
+                    },
+                    "description": "Create order from cart items"
+                },
+                {
+                    "name": "Get My Orders",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{authToken}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "http://localhost:5000/api/orders/my-orders?page=1&limit=10",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "5000",
+                            "path": ["api", "orders", "my-orders"],
+                            "query": [
+                                {
+                                    "key": "page",
+                                    "value": "1",
+                                    "description": "Page number"
+                                },
+                                {
+                                    "key": "limit",
+                                    "value": "10",
+                                    "description": "Items per page (max 50)"
+                                }
+                            ]
+                        }
+                    },
+                    "description": "Get logged-in user's order history with pagination"
+                },
+                {
+                    "name": "Get Order by ID",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{authToken}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "http://localhost:5000/api/orders/{{ORDER_ID}}",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "5000",
+                            "path": ["api", "orders", "{{ORDER_ID}}"]
+                        }
+                    },
+                    "description": "Get specific order details"
+                },
+                {
+                    "name": "Get All Orders (Admin)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{authToken}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "http://localhost:5000/api/orders/all?page=1&limit=10",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "5000",
+                            "path": ["api", "orders", "all"],
+                            "query": [
+                                {
+                                    "key": "page",
+                                    "value": "1"
+                                },
+                                {
+                                    "key": "limit",
+                                    "value": "10"
+                                },
+                                {
+                                    "key": "status",
+                                    "value": "Pending",
+                                    "disabled": true,
+                                    "description": "Filter by status"
+                                },
+                                {
+                                    "key": "paymentStatus",
+                                    "value": "Paid",
+                                    "disabled": true,
+                                    "description": "Filter by payment status"
+                                },
+                                {
+                                    "key": "search",
+                                    "value": "john",
+                                    "disabled": true,
+                                    "description": "Search by user name/email/phone"
+                                },
+                                {
+                                    "key": "startDate",
+                                    "value": "2025-11-01",
+                                    "disabled": true,
+                                    "description": "Filter from date (YYYY-MM-DD)"
+                                },
+                                {
+                                    "key": "endDate",
+                                    "value": "2025-12-31",
+                                    "disabled": true,
+                                    "description": "Filter to date (YYYY-MM-DD)"
+                                }
+                            ]
+                        }
+                    },
+                    "description": "Admin view all orders with pagination, search, and filters"
+                },
+                {
+                    "name": "Update Order Status (Admin)",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{authToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"status\": \"Under Verification\"\n}"
+                        },
+                        "url": {
+                            "raw": "http://localhost:5000/api/orders/{{ORDER_ID}}/status",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "5000",
+                            "path": ["api", "orders", "{{ORDER_ID}}", "status"]
+                        }
+                    },
+                    "description": "Update order status. Valid: Pending, Under Verification, Documentation, Completed, Cancelled"
+                },
+                {
+                    "name": "Update Payment Status (Admin)",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{authToken}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"paymentStatus\": \"Paid\"\n}"
+                        },
+                        "url": {
+                            "raw": "http://localhost:5000/api/orders/{{ORDER_ID}}/payment",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "5000",
+                            "path": ["api", "orders", "{{ORDER_ID}}", "payment"]
+                        }
+                    },
+                    "description": "Update payment status. Valid: Pending, Paid, Failed, Refunded"
+                }
+            ]
+        },
+        {
+            "name": "Dashboard (Admin)",
+            "item": [
+                {
+                    "name": "Get Dashboard Stats",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{authToken}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "http://localhost:5000/api/dashboard/stats",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "5000",
+                            "path": ["api", "dashboard", "stats"]
+                        }
+                    },
+                    "description": "Get dashboard overview: orders, users, services, revenue, orders by status, latest orders, monthly revenue"
+                },
+                {
+                    "name": "Get Revenue Stats",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{authToken}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "http://localhost:5000/api/dashboard/revenue",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "5000",
+                            "path": ["api", "dashboard", "revenue"]
+                        }
+                    },
+                    "description": "Get total revenue, average order value, top services"
+                },
+                {
+                    "name": "Get Revenue by Date Range",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{authToken}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "http://localhost:5000/api/dashboard/revenue?startDate=2025-11-01&endDate=2025-12-13",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "5000",
+                            "path": ["api", "dashboard", "revenue"],
+                            "query": [
+                                {
+                                    "key": "startDate",
+                                    "value": "2025-11-01",
+                                    "description": "Start date (YYYY-MM-DD)"
+                                },
+                                {
+                                    "key": "endDate",
+                                    "value": "2025-12-13",
+                                    "description": "End date (YYYY-MM-DD)"
+                                }
+                            ]
+                        }
+                    },
+                    "description": "Filter revenue by custom date range"
+                },
+                {
+                    "name": "Get Orders Analytics",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{authToken}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "http://localhost:5000/api/dashboard/orders-analytics",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "5000",
+                            "path": ["api", "dashboard", "orders-analytics"]
+                        }
+                    },
+                    "description": "Get orders by payment status, daily orders (last 30 days), top customers"
+                },
+                {
+                    "name": "Get Users Analytics",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{authToken}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "http://localhost:5000/api/dashboard/users-analytics",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "5000",
+                            "path": ["api", "dashboard", "users-analytics"]
+                        }
+                    },
+                    "description": "Get user counts by role, new users (30 days), active users, recent users"
+                }
+            ]
+        }
+    ]
+}
